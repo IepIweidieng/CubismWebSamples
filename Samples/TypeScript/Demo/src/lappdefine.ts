@@ -77,6 +77,9 @@ export interface IAppConfig {
   // デフォルトのレンダーターゲットサイズ
   RenderTargetWidth: number;
   RenderTargetHeight: number;
+
+  // Relative path to the custom configuration file
+  _ConfigFileName: string;
 }
 
 /**

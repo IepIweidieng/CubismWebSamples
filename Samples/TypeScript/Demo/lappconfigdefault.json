@@ -50,5 +50,7 @@
   "CubismLoggingLevel": 0,
 
   "RenderTargetWidth": 1900,
-  "RenderTargetHeight": 1000
+  "RenderTargetHeight": 1000,
+
+  "_ConfigFileName": "lappconfig.json"
 }

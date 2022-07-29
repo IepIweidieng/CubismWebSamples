@@ -6,12 +6,14 @@
  */
 
 import { LAppDelegate } from './lappdelegate';
-import { appConfig } from './lappdefine';
+import { appConfig, LAppDefine } from './lappdefine';
 
 /**
  * ブラウザロード後の処理
  */
-window.onload = (): void => {
+window.onload = async (): Promise<void> => {
+  // try to load the custom configuration; skip when loading fails
+  await LAppDefine.loadFromFile(appConfig._ConfigFileName);
   // create the application instance
   if (LAppDelegate.getInstance().initialize() == false) {
     return;

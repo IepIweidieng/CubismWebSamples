@@ -34,7 +34,7 @@ import { csmString } from '@framework/type/csmstring';
 import { csmVector } from '@framework/type/csmvector';
 import { CubismLogInfo } from '@framework/utils/cubismdebug';
 
-import * as LAppDefine from './lappdefine';
+import { appConfig } from './lappdefine';
 import { canvas, frameBuffer, gl, LAppDelegate } from './lappdelegate';
 import { LAppPal } from './lapppal';
 import { TextureInfo } from './lapptexturemanager';
@@ -451,10 +451,7 @@ export class LAppModel extends CubismUserModel {
     this._model.loadParameters(); // 前回セーブされた状態をロード
     if (this._motionManager.isFinished()) {
       // モーションの再生がない場合、待機モーションの中からランダムで再生する
-      this.startRandomMotion(
-        LAppDefine.MotionGroupIdle,
-        LAppDefine.PriorityIdle
-      );
+      this.startRandomMotion(appConfig.MotionGroupIdle, appConfig.PriorityIdle);
     } else {
       motionUpdated = this._motionManager.updateMotion(
         this._model,
@@ -539,7 +536,7 @@ export class LAppModel extends CubismUserModel {
     priority: number,
     onFinishedMotionHandler?: FinishedMotionCallback
   ): CubismMotionQueueEntryHandle {
-    if (priority == LAppDefine.PriorityForce) {
+    if (priority == appConfig.PriorityForce) {
       this._motionManager.setReservePriority(priority);
     } else if (!this._motionManager.reserveMotion(priority)) {
       if (this._debugMode) {
@@ -643,7 +640,7 @@ export class LAppModel extends CubismUserModel {
       this._expressionManager.startMotionPriority(
         motion,
         false,
-        LAppDefine.PriorityForce
+        appConfig.PriorityForce
       );
     } else {
       if (this._debugMode) {

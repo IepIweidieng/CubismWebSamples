@@ -8,7 +8,7 @@
 import { CubismMatrix44 } from '@framework/math/cubismmatrix44';
 import { CubismViewMatrix } from '@framework/math/cubismviewmatrix';
 
-import * as LAppDefine from './lappdefine';
+import { appConfig } from './lappdefine';
 import { canvas, gl, LAppDelegate } from './lappdelegate';
 import { LAppLive2DManager } from './lapplive2dmanager';
 import { LAppPal } from './lapppal';
@@ -47,11 +47,11 @@ export class LAppView {
     const ratio: number = width / height;
     const left: number = -ratio;
     const right: number = ratio;
-    const bottom: number = LAppDefine.ViewLogicalLeft;
-    const top: number = LAppDefine.ViewLogicalRight;
+    const bottom: number = appConfig.ViewLogicalLeft;
+    const top: number = appConfig.ViewLogicalRight;
 
     this._viewMatrix.setScreenRect(left, right, bottom, top); // デバイスに対応する画面の範囲。 Xの左端、Xの右端、Yの下端、Yの上端
-    this._viewMatrix.scale(LAppDefine.ViewScale, LAppDefine.ViewScale);
+    this._viewMatrix.scale(appConfig.ViewScale, appConfig.ViewScale);
 
     this._deviceToScreen.loadIdentity();
     if (width > height) {
@@ -64,15 +64,15 @@ export class LAppView {
     this._deviceToScreen.translateRelative(-width * 0.5, -height * 0.5);
 
     // 表示範囲の設定
-    this._viewMatrix.setMaxScale(LAppDefine.ViewMaxScale); // 限界拡張率
-    this._viewMatrix.setMinScale(LAppDefine.ViewMinScale); // 限界縮小率
+    this._viewMatrix.setMaxScale(appConfig.ViewMaxScale); // 限界拡張率
+    this._viewMatrix.setMinScale(appConfig.ViewMinScale); // 限界縮小率
 
     // 表示できる最大範囲
     this._viewMatrix.setMaxScreenRect(
-      LAppDefine.ViewLogicalMaxLeft,
-      LAppDefine.ViewLogicalMaxRight,
-      LAppDefine.ViewLogicalMaxBottom,
-      LAppDefine.ViewLogicalMaxTop
+      appConfig.ViewLogicalMaxLeft,
+      appConfig.ViewLogicalMaxRight,
+      appConfig.ViewLogicalMaxBottom,
+      appConfig.ViewLogicalMaxTop
     );
   }
 
@@ -124,12 +124,12 @@ export class LAppView {
     const height: number = canvas.height;
 
     const textureManager = LAppDelegate.getInstance().getTextureManager();
-    const resourcesPath = LAppDefine.ResourcesPath;
+    const resourcesPath = appConfig.ResourcesPath;
 
     let imageName = '';
 
     // 背景画像初期化
-    imageName = LAppDefine.BackImageName;
+    imageName = appConfig.BackImageName;
 
     // 非同期なのでコールバック関数を作成
     const initBackGroundTexture = (textureInfo: TextureInfo): void => {
@@ -148,7 +148,7 @@ export class LAppView {
     );
 
     // 歯車画像初期化
-    imageName = LAppDefine.GearImageName;
+    imageName = appConfig.GearImageName;
     const initGearTexture = (textureInfo: TextureInfo): void => {
       const x = width - textureInfo.width * 0.5;
       const y = height - textureInfo.height * 0.5;
@@ -215,7 +215,7 @@ export class LAppView {
         this._touchManager.getY()
       ); // 論理座標変化した座標を取得。
 
-      if (LAppDefine.DebugTouchLogEnable) {
+      if (appConfig.DebugTouchLogEnable) {
         LAppPal.printMessage(`[APP]touchesEnded x: ${x} y: ${y}`);
       }
       live2DManager.onTap(x, y);

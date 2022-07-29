@@ -7,7 +7,7 @@
 
 import { CubismFramework, Option } from '@framework/live2dcubismframework';
 
-import * as LAppDefine from './lappdefine';
+import { appConfig } from './lappdefine';
 import { LAppLive2DManager } from './lapplive2dmanager';
 import { LAppPal } from './lapppal';
 import { LAppTextureManager } from './lapptexturemanager';
@@ -54,11 +54,11 @@ export class LAppDelegate {
   public initialize(): boolean {
     // キャンバスの作成
     canvas = document.createElement('canvas');
-    if (LAppDefine.CanvasSize === 'auto') {
+    if (appConfig.CanvasSize === 'auto') {
       this._resizeCanvas();
     } else {
-      canvas.width = LAppDefine.CanvasSize.width;
-      canvas.height = LAppDefine.CanvasSize.height;
+      canvas.width = appConfig.CanvasSize.width;
+      canvas.height = appConfig.CanvasSize.height;
     }
 
     // glコンテキストを初期化
@@ -276,7 +276,7 @@ export class LAppDelegate {
   public initializeCubism(): void {
     // setup cubism
     this._cubismOption.logFunction = LAppPal.printMessage;
-    this._cubismOption.loggingLevel = LAppDefine.CubismLoggingLevel;
+    this._cubismOption.loggingLevel = appConfig.CubismLoggingLevel;
     CubismFramework.startUp(this._cubismOption);
 
     // initialize cubism

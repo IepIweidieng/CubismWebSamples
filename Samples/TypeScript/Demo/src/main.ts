@@ -6,7 +6,7 @@
  */
 
 import { LAppDelegate } from './lappdelegate';
-import * as LAppDefine from './lappdefine';
+import { appConfig } from './lappdefine';
 
 /**
  * ブラウザロード後の処理
@@ -29,7 +29,7 @@ window.onbeforeunload = (): void => LAppDelegate.releaseInstance();
  * Process when changing screen size.
  */
 window.onresize = () => {
-  if (LAppDefine.CanvasSize === 'auto') {
+  if (appConfig.CanvasSize === 'auto') {
     LAppDelegate.getInstance().onResize();
   }
 };

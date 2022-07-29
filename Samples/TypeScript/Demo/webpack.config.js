@@ -11,7 +11,7 @@ module.exports = {
     publicPath: '/dist/'
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.js', '.json'],
     alias: {
       '@framework': path.resolve(__dirname, '../../../Framework/src')
     }

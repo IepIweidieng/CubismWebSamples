@@ -1,0 +1,54 @@
+{
+  "CanvasSize": "auto",
+
+  "ViewScale": 1.0,
+  "ViewMaxScale": 2.0,
+  "ViewMinScale": 0.8,
+
+  "ViewLogicalLeft": -1.0,
+  "ViewLogicalRight": 1.0,
+  "ViewLogicalBottom": -1.0,
+  "ViewLogicalTop": 1.0,
+
+  "ViewLogicalMaxLeft": -2.0,
+  "ViewLogicalMaxRight": 2.0,
+  "ViewLogicalMaxBottom": -2.0,
+  "ViewLogicalMaxTop": 2.0,
+
+  "ResourcesPath": "../../Resources/",
+
+  "BackImageName": "back_class_normal.png",
+
+  "GearImageName": "icon_gear.png",
+
+  "PowerImageName": "CloseNormal.png",
+
+  "ModelDir": [
+    "Haru",
+    "Hiyori",
+    "Mark",
+    "Natori",
+    "Rice",
+    "Mao"
+  ],
+  "ModelDirSize": 6,
+
+  "MotionGroupIdle": "Idle",
+  "MotionGroupTapBody": "TapBody",
+
+  "HitAreaNameHead": "Head",
+  "HitAreaNameBody": "Body",
+
+  "PriorityNone": 0,
+  "PriorityIdle": 1,
+  "PriorityNormal": 2,
+  "PriorityForce": 3,
+
+  "DebugLogEnable": true,
+  "DebugTouchLogEnable": false,
+
+  "CubismLoggingLevel": 0,
+
+  "RenderTargetWidth": 1900,
+  "RenderTargetHeight": 1000
+}

@@ -9,7 +9,7 @@ import { CubismMatrix44 } from '@framework/math/cubismmatrix44';
 import { ACubismMotion } from '@framework/motion/acubismmotion';
 import { csmVector } from '@framework/type/csmvector';
 
-import * as LAppDefine from './lappdefine';
+import { appConfig } from './lappdefine';
 import { canvas } from './lappdelegate';
 import { LAppModel } from './lappmodel';
 import { LAppPal } from './lapppal';
@@ -95,31 +95,27 @@ export class LAppLive2DManager {
    * @param y 画面のY座標
    */
   public onTap(x: number, y: number): void {
-    if (LAppDefine.DebugLogEnable) {
+    if (appConfig.DebugLogEnable) {
       LAppPal.printMessage(
         `[APP]tap point: {x: ${x.toFixed(2)} y: ${y.toFixed(2)}}`
       );
     }
 
     for (let i = 0; i < this._models.getSize(); i++) {
-      if (this._models.at(i).hitTest(LAppDefine.HitAreaNameHead, x, y)) {
-        if (LAppDefine.DebugLogEnable) {
-          LAppPal.printMessage(
-            `[APP]hit area: [${LAppDefine.HitAreaNameHead}]`
-          );
+      if (this._models.at(i).hitTest(appConfig.HitAreaNameHead, x, y)) {
+        if (appConfig.DebugLogEnable) {
+          LAppPal.printMessage(`[APP]hit area: [${appConfig.HitAreaNameHead}]`);
         }
         this._models.at(i).setRandomExpression();
-      } else if (this._models.at(i).hitTest(LAppDefine.HitAreaNameBody, x, y)) {
-        if (LAppDefine.DebugLogEnable) {
-          LAppPal.printMessage(
-            `[APP]hit area: [${LAppDefine.HitAreaNameBody}]`
-          );
+      } else if (this._models.at(i).hitTest(appConfig.HitAreaNameBody, x, y)) {
+        if (appConfig.DebugLogEnable) {
+          LAppPal.printMessage(`[APP]hit area: [${appConfig.HitAreaNameBody}]`);
         }
         this._models
           .at(i)
           .startRandomMotion(
-            LAppDefine.MotionGroupTapBody,
-            LAppDefine.PriorityNormal,
+            appConfig.MotionGroupTapBody,
+            appConfig.PriorityNormal,
             this._finishedMotion
           );
       }
@@ -164,7 +160,7 @@ export class LAppLive2DManager {
    * サンプルアプリケーションではモデルセットの切り替えを行う。
    */
   public nextScene(): void {
-    const no: number = (this._sceneIndex + 1) % LAppDefine.ModelDirSize;
+    const no: number = (this._sceneIndex + 1) % appConfig.ModelDirSize;
     this.changeScene(no);
   }
 
@@ -174,16 +170,16 @@ export class LAppLive2DManager {
    */
   public changeScene(index: number): void {
     this._sceneIndex = index;
-    if (LAppDefine.DebugLogEnable) {
+    if (appConfig.DebugLogEnable) {
       LAppPal.printMessage(`[APP]model index: ${this._sceneIndex}`);
     }
 
     // ModelDir[]に保持したディレクトリ名から
     // model3.jsonのパスを決定する。
     // ディレクトリ名とmodel3.jsonの名前を一致させておくこと。
-    const model: string = LAppDefine.ModelDir[index];
-    const modelPath: string = LAppDefine.ResourcesPath + model + '/';
-    let modelJsonName: string = LAppDefine.ModelDir[index];
+    const model: string = appConfig.ModelDir[index];
+    const modelPath: string = appConfig.ResourcesPath + model + '/';
+    let modelJsonName: string = appConfig.ModelDir[index];
     modelJsonName += '.model3.json';
 
     this.releaseAllModel();

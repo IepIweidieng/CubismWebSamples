@@ -9,7 +9,7 @@ import { LogLevel } from '@framework/live2dcubismframework';
 import appConfigDefault from '../lappconfigdefault.json';
 
 export { appConfigDefault };
-export const appConfig: IAppConfig = JSON.parse(
+export let appConfig: IAppConfig = JSON.parse(
   JSON.stringify(appConfigDefault)
 ) as IAppConfig;
 
@@ -77,4 +77,52 @@ export interface IAppConfig {
   // デフォルトのレンダーターゲットサイズ
   RenderTargetWidth: number;
   RenderTargetHeight: number;
+}
+
+/**
+ * App configuration manager
+ */
+export class LAppDefine {
+  /**
+   * Reset the configuration to the default.
+   * @return whether the operation successed
+   */
+  public static reset(): boolean {
+    appConfig = JSON.parse(JSON.stringify(appConfigDefault)) as IAppConfig;
+    return true;
+  }
+
+  /**
+   * Load the configuration. Not specified options kept their old value.
+   * @param config an object containing options
+   * @return whether the operation successed
+   */
+  public static load(config: IAppConfig): boolean {
+    Object.assign(appConfig, config);
+    return true;
+  }
+
+  /**
+   * Load the configuration from a config file. Not specified options kept their old value.
+   * @param configFile an JSON file containing an object for options
+   * @param whether the loading is required to success
+   * @return a Promise whose resolved value indicates whether the operation successed
+   */
+  public static async loadFromFile(
+    configFile: string,
+    required = false
+  ): Promise<boolean> {
+    return fetch(configFile)
+      .then(response => response.json())
+      .then(config => {
+        Object.assign(appConfig, config as IAppConfig);
+        return true;
+      })
+      .catch(e => {
+        if (required) {
+          throw e;
+        }
+        return false;
+      });
+  }
 }

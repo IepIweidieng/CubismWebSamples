@@ -592,7 +592,7 @@ export class LAppModel extends CubismUserModel {
     }
 
     if (this._debugMode) {
-      LAppPal.printMessage(`[APP]start motion: [${group}_${no}`);
+      LAppPal.printMessage(`[APP]start motion: [${group}_${no}]`);
     }
     return this._motionManager.startMotionPriority(
       motion,

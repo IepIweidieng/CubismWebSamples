@@ -3,6 +3,8 @@
 
   "CanvasSize": "auto",
 
+  "_CanvasHighDpi": true,
+
   "ViewScale": 1.0,
   "ViewMaxScale": 2.0,
   "ViewMinScale": 0.8,

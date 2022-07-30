@@ -9,7 +9,7 @@ import { CubismMatrix44 } from '@framework/math/cubismmatrix44';
 import { CubismViewMatrix } from '@framework/math/cubismviewmatrix';
 
 import { appConfig } from './lappdefine';
-import { canvas, gl, LAppDelegate } from './lappdelegate';
+import { canvas, canvasPixelRatio, gl, LAppDelegate } from './lappdelegate';
 import { LAppLive2DManager } from './lapplive2dmanager';
 import { LAppPal } from './lapppal';
 import { LAppSprite } from './lappsprite';
@@ -122,6 +122,7 @@ export class LAppView {
   public initializeSprite(): void {
     const width: number = canvas.width;
     const height: number = canvas.height;
+    const pr: number = canvasPixelRatio;
 
     const textureManager = LAppDelegate.getInstance().getTextureManager();
     const resourcesPath = appConfig.ResourcesPath;
@@ -136,7 +137,7 @@ export class LAppView {
       const x: number = width * 0.5;
       const y: number = height * 0.5;
 
-      const fwidth = textureInfo.width * 2.0;
+      const fwidth = pr * textureInfo.width * 2.0;
       const fheight = height * 0.95;
       this._back = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
     };
@@ -150,10 +151,10 @@ export class LAppView {
     // 歯車画像初期化
     imageName = appConfig.GearImageName;
     const initGearTexture = (textureInfo: TextureInfo): void => {
-      const x = width - textureInfo.width * 0.5;
-      const y = height - textureInfo.height * 0.5;
-      const fwidth = textureInfo.width;
-      const fheight = textureInfo.height;
+      const x = width - pr * textureInfo.width * 0.5;
+      const y = height - pr * textureInfo.height * 0.5;
+      const fwidth = pr * textureInfo.width;
+      const fheight = pr * textureInfo.height;
       this._gear = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
     };
 

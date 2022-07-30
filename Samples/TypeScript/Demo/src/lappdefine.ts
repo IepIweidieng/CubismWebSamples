@@ -23,6 +23,10 @@ export interface IAppConfig {
   // Canvas width and height pixel values, or dynamic screen size ('auto').
   CanvasSize: { width: number; height: number } | 'auto';
 
+  // Enable high DPI display (for devices whose 1 CSS pixel !== 1 real pixel)
+  // require the width and height of the canvas to be set by CSS if CanvasSize is 'auto'
+  _CanvasHighDpi: boolean;
+
   // 画面
   ViewScale: number;
   ViewMaxScale: number;

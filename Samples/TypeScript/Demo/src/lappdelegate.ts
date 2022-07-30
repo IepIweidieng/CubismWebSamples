@@ -14,6 +14,7 @@ import { LAppTextureManager } from './lapptexturemanager';
 import { LAppView } from './lappview';
 
 export let canvas: HTMLCanvasElement = null;
+export let canvasPixelRatio = 1;
 export let s_instance: LAppDelegate = null;
 export let gl: WebGLRenderingContext = null;
 export let frameBuffer: WebGLFramebuffer = null;
@@ -91,7 +92,7 @@ export class LAppDelegate {
     }
 
     // set up the resizing handling
-    if (appConfig.CanvasSize === 'auto') {
+    if (appConfig.CanvasSize === 'auto' || appConfig._CanvasHighDpi) {
       this._initializeResizeHandler();
     }
 
@@ -320,12 +321,19 @@ export class LAppDelegate {
    * Initialize the size of the canvas to fit the element.
    */
   private _initializeCanvasSize(): void {
+    const dpr = window.devicePixelRatio || 1;
+    const pr = appConfig._CanvasHighDpi ? dpr : 1;
+    canvasPixelRatio = pr;
+
     if (appConfig.CanvasSize === 'auto') {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
+      canvas.width = Math.round(pr * canvas.clientWidth);
+      canvas.height = Math.round(pr * canvas.clientHeight);
     } else {
-      canvas.width = appConfig.CanvasSize.width;
-      canvas.height = appConfig.CanvasSize.height;
+      canvas.width = Math.round(pr * appConfig.CanvasSize.width);
+      canvas.height = Math.round(pr * appConfig.CanvasSize.height);
+      // set the CSS size for high DPI display
+      canvas.style.width = `${canvas.width}px`;
+      canvas.style.height = `${canvas.height}px`;
     }
     this._canvasSize = [canvas.width, canvas.height];
   }
@@ -338,23 +346,65 @@ export class LAppDelegate {
       const entry = entries.find(entry => entry.target === canvas);
 
       // get the size object
+      const dpSize =
+        (appConfig._CanvasHighDpi &&
+          entry.devicePixelContentBoxSize &&
+          entry.devicePixelContentBoxSize[0]) ||
+        null;
       const size =
-        entry.contentBoxSize &&
-        ((entry.contentBoxSize[0] ||
-          (entry.contentBoxSize as unknown)) as ResizeObserverSize);
+        dpSize ||
+        (entry.contentBoxSize &&
+          ((entry.contentBoxSize[0] ||
+            (entry.contentBoxSize as unknown)) as ResizeObserverSize));
 
       // get the size parameters
       const w: number = size ? size.inlineSize : entry.contentRect.width;
       const h: number = size ? size.blockSize : entry.contentRect.height;
+      const pr = dpSize ? 1 : canvasPixelRatio;
 
-      if (w !== this._canvasSize[0] || h !== this._canvasSize[1]) {
-        this._canvasSize = [w, h];
+      // calculate the size
+      const dw = Math.round(pr * w);
+      const dh = Math.round(pr * h);
+
+      if (dw !== this._canvasSize[0] || dh !== this._canvasSize[1]) {
+        this._canvasSize = [dw, dh];
         this.onResize();
       }
     };
 
     this._resizeObserver = new ResizeObserver(updateCanvasSize);
-    this._resizeObserver.observe(canvas, { box: 'content-box' });
+
+    try {
+      // allow to get the canvas size in device pixels
+      this._resizeObserver.observe(canvas, {
+        box: 'device-pixel-content-box'
+      });
+    } catch (e) {
+      // device-pixel-content-box is not supported; fallback
+      this._resizeObserver.observe(canvas, { box: 'content-box' });
+    }
+
+    // handle pixel ratio changes
+    const updateCanvasPixelRatio = (): void => {
+      if (s_instance == null) {
+        return;
+      }
+      const dpr = window.devicePixelRatio || 1;
+      const pr = appConfig._CanvasHighDpi ? dpr : 1;
+      if (pr !== canvasPixelRatio) {
+        canvasPixelRatio = pr;
+        this.onResize();
+      }
+
+      // listen for a further change
+      matchMedia(`(resolution: ${dpr}dppx)`).addEventListener(
+        'change',
+        updateCanvasPixelRatio,
+        { once: true }
+      );
+    };
+
+    updateCanvasPixelRatio();
   }
 
   /**
@@ -387,8 +437,8 @@ function onClickBegan(e: MouseEvent): void {
   LAppDelegate.getInstance()._captured = true;
 
   const rect = (e.target as Element).getBoundingClientRect();
-  const posX: number = e.clientX - rect.left;
-  const posY: number = e.clientY - rect.top;
+  const posX: number = canvasPixelRatio * (e.clientX - rect.left);
+  const posY: number = canvasPixelRatio * (e.clientY - rect.top);
 
   LAppDelegate.getInstance()._view.onTouchesBegan(posX, posY);
 }
@@ -407,8 +457,8 @@ function onMouseMoved(e: MouseEvent): void {
   }
 
   const rect = (e.target as Element).getBoundingClientRect();
-  const posX: number = e.clientX - rect.left;
-  const posY: number = e.clientY - rect.top;
+  const posX: number = canvasPixelRatio * (e.clientX - rect.left);
+  const posY: number = canvasPixelRatio * (e.clientY - rect.top);
 
   LAppDelegate.getInstance()._view.onTouchesMoved(posX, posY);
 }
@@ -424,8 +474,8 @@ function onClickEnded(e: MouseEvent): void {
   }
 
   const rect = (e.target as Element).getBoundingClientRect();
-  const posX: number = e.clientX - rect.left;
-  const posY: number = e.clientY - rect.top;
+  const posX: number = canvasPixelRatio * (e.clientX - rect.left);
+  const posY: number = canvasPixelRatio * (e.clientY - rect.top);
 
   LAppDelegate.getInstance()._view.onTouchesEnded(posX, posY);
 }
@@ -442,8 +492,8 @@ function onTouchBegan(e: TouchEvent): void {
   LAppDelegate.getInstance()._captured = true;
 
   const rect = (e.target as Element).getBoundingClientRect();
-  const posX = e.changedTouches[0].clientX - rect.left;
-  const posY = e.changedTouches[0].clientY - rect.top;
+  const posX = canvasPixelRatio * (e.changedTouches[0].clientX - rect.left);
+  const posY = canvasPixelRatio * (e.changedTouches[0].clientY - rect.top);
 
   LAppDelegate.getInstance()._view.onTouchesBegan(posX, posY);
 }
@@ -463,8 +513,8 @@ function onTouchMoved(e: TouchEvent): void {
 
   const rect = (e.target as Element).getBoundingClientRect();
 
-  const posX = e.changedTouches[0].clientX - rect.left;
-  const posY = e.changedTouches[0].clientY - rect.top;
+  const posX = canvasPixelRatio * (e.changedTouches[0].clientX - rect.left);
+  const posY = canvasPixelRatio * (e.changedTouches[0].clientY - rect.top);
 
   LAppDelegate.getInstance()._view.onTouchesMoved(posX, posY);
 }
@@ -482,8 +532,8 @@ function onTouchEnded(e: TouchEvent): void {
 
   const rect = (e.target as Element).getBoundingClientRect();
 
-  const posX = e.changedTouches[0].clientX - rect.left;
-  const posY = e.changedTouches[0].clientY - rect.top;
+  const posX = canvasPixelRatio * (e.changedTouches[0].clientX - rect.left);
+  const posY = canvasPixelRatio * (e.changedTouches[0].clientY - rect.top);
 
   LAppDelegate.getInstance()._view.onTouchesEnded(posX, posY);
 }
@@ -501,8 +551,8 @@ function onTouchCancel(e: TouchEvent): void {
 
   const rect = (e.target as Element).getBoundingClientRect();
 
-  const posX = e.changedTouches[0].clientX - rect.left;
-  const posY = e.changedTouches[0].clientY - rect.top;
+  const posX = canvasPixelRatio * (e.changedTouches[0].clientX - rect.left);
+  const posY = canvasPixelRatio * (e.changedTouches[0].clientY - rect.top);
 
   LAppDelegate.getInstance()._view.onTouchesEnded(posX, posY);
 }

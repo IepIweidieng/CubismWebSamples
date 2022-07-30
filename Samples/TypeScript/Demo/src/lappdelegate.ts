@@ -54,12 +54,13 @@ export class LAppDelegate {
   public initialize(): boolean {
     // キャンバスの作成
     canvas = document.createElement('canvas');
+    // make the newly created canvas fit the window
     if (appConfig.CanvasSize === 'auto') {
-      this._resizeCanvas();
-    } else {
-      canvas.width = appConfig.CanvasSize.width;
-      canvas.height = appConfig.CanvasSize.height;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
     }
+
+    this._initializeCanvasSize();
 
     // glコンテキストを初期化
     // @ts-ignore
@@ -78,6 +79,11 @@ export class LAppDelegate {
 
     // キャンバスを DOM に追加
     document.body.appendChild(canvas);
+
+    // set up the resizing handling
+    if (appConfig.CanvasSize === 'auto') {
+      this._initializeResizeHandler();
+    }
 
     if (!frameBuffer) {
       frameBuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
@@ -129,6 +135,9 @@ export class LAppDelegate {
    * 解放する。
    */
   public release(): void {
+    this._resizeObserver.disconnect();
+    this._resizeObserver = null;
+
     this._textureManager.release();
     this._textureManager = null;
 
@@ -273,6 +282,8 @@ export class LAppDelegate {
     this._cubismOption = new Option();
     this._view = new LAppView();
     this._textureManager = new LAppTextureManager();
+
+    this._canvasSize = [0, 0];
   }
 
   /**
@@ -296,11 +307,52 @@ export class LAppDelegate {
   }
 
   /**
-   * Resize the canvas to fill the screen.
+   * Initialize the size of the canvas to fit the element.
+   */
+  private _initializeCanvasSize(): void {
+    if (appConfig.CanvasSize === 'auto') {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    } else {
+      canvas.width = appConfig.CanvasSize.width;
+      canvas.height = appConfig.CanvasSize.height;
+    }
+    this._canvasSize = [canvas.width, canvas.height];
+  }
+
+  /**
+   * Initialize the resize handlers for the canvas.
+   */
+  private _initializeResizeHandler(): void {
+    const updateCanvasSize = (entries: ResizeObserverEntry[]): void => {
+      const entry = entries.find(entry => entry.target === canvas);
+
+      // get the size object
+      const size =
+        entry.contentBoxSize &&
+        ((entry.contentBoxSize[0] ||
+          (entry.contentBoxSize as unknown)) as ResizeObserverSize);
+
+      // get the size parameters
+      const w: number = size ? size.inlineSize : entry.contentRect.width;
+      const h: number = size ? size.blockSize : entry.contentRect.height;
+
+      if (w !== this._canvasSize[0] || h !== this._canvasSize[1]) {
+        this._canvasSize = [w, h];
+        this.onResize();
+      }
+    };
+
+    this._resizeObserver = new ResizeObserver(updateCanvasSize);
+    this._resizeObserver.observe(canvas, { box: 'content-box' });
+  }
+
+  /**
+   * Resize the canvas to fit the element.
    */
   private _resizeCanvas(): void {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = this._canvasSize[0];
+    canvas.height = this._canvasSize[1];
   }
 
   _cubismOption: Option; // Cubism SDK Option
@@ -310,6 +362,8 @@ export class LAppDelegate {
   _mouseY: number; // マウスY座標
   _isEnd: boolean; // APP終了しているか
   _textureManager: LAppTextureManager; // テクスチャマネージャー
+  _resizeObserver: ResizeObserver; // For getting the pending canvas size
+  _canvasSize: [number, number]; // The pending size of the canvas
 }
 
 /**

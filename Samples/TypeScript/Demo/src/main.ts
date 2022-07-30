@@ -26,12 +26,3 @@ window.onload = async (): Promise<void> => {
  * 終了時の処理
  */
 window.onbeforeunload = (): void => LAppDelegate.releaseInstance();
-
-/**
- * Process when changing screen size.
- */
-window.onresize = () => {
-  if (appConfig.CanvasSize === 'auto') {
-    LAppDelegate.getInstance().onResize();
-  }
-};

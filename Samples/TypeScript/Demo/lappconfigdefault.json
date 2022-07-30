@@ -52,5 +52,7 @@
   "RenderTargetWidth": 1900,
   "RenderTargetHeight": 1000,
 
+  "_RenderClearColor": [0.0, 0.0, 0.0, 1.0],
+
   "_ConfigFileName": "lappconfig.json"
 }

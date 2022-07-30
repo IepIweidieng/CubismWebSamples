@@ -78,6 +78,10 @@ export interface IAppConfig {
   RenderTargetWidth: number;
   RenderTargetHeight: number;
 
+  // Set the render screen to this color when the screen is cleared
+  // [red, green, blue, alpha] (0.0 to 1.0)
+  _RenderClearColor: [number, number, number, number];
+
   // Relative path to the custom configuration file
   _ConfigFileName: string;
 }

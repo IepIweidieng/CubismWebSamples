@@ -29,6 +29,9 @@ export class LAppWavFileHandler {
    */
   public static releaseInstance(): void {
     if (s_instance != null) {
+      s_instance._audioContext.close();
+      s_instance._audioContext = null;
+
       s_instance = void 0;
     }
 
@@ -95,6 +98,8 @@ export class LAppWavFileHandler {
     if (!(await this.loadWavFile(filePath))) {
       return;
     }
+
+    this._audioSource.start(0);
   }
 
   public getRms(): number {
@@ -106,6 +111,10 @@ export class LAppWavFileHandler {
 
     if (this._pcmData != null) {
       this.releasePcmData();
+    }
+
+    if (this._audioSource != null) {
+      this._audioSource = null;
     }
 
     // ファイルロード
@@ -219,6 +228,45 @@ export class LAppWavFileHandler {
           }
         }
 
+        if (!this._audioContext) {
+          this._audioContext = new (window.AudioContext ||
+            (
+              window as unknown as {
+                webkitAudioContext: { new (): AudioContext };
+              }
+            ).webkitAudioContext)();
+        }
+
+        // create audio buffer for playback
+        this._audioSource = this._audioContext.createBufferSource();
+        this._audioSource.buffer = new AudioBuffer({
+          length:
+            this._wavFileInfo._numberOfChannels *
+            this._wavFileInfo._samplesPerChannel,
+          numberOfChannels: this._wavFileInfo._numberOfChannels,
+          sampleRate: this._wavFileInfo._samplingRate
+        });
+
+        // copy waveform data
+        for (
+          let channelCount = 0;
+          channelCount < this._wavFileInfo._numberOfChannels;
+          channelCount++
+        ) {
+          const channelData =
+            this._audioSource.buffer.getChannelData(channelCount);
+          for (
+            let sampleCount = 0;
+            sampleCount < this._wavFileInfo._samplesPerChannel;
+            sampleCount++
+          ) {
+            channelData[sampleCount] = this._pcmData[channelCount][sampleCount];
+          }
+        }
+
+        // connect to playback device
+        this._audioSource.connect(this._audioContext.destination);
+
         ret = true;
       } catch (e) {
         console.log(e);
@@ -271,6 +319,9 @@ export class LAppWavFileHandler {
     this._sampleOffset = 0.0;
     this._wavFileInfo = new WavFileInfo();
     this._byteReader = new ByteReader();
+
+    this._audioContext = null;
+    this._audioSource = null;
   }
 
   _pcmData: Array<Float32Array>;
@@ -284,6 +335,8 @@ export class LAppWavFileHandler {
     this._byteReader._fileDataView = new DataView(this._byteReader._fileByte);
     this._byteReader._fileSize = length;
   };
+  _audioContext: AudioContext;
+  _audioSource: AudioBufferSourceNode;
 }
 
 export class WavFileInfo {

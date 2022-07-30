@@ -52,12 +52,20 @@ export class LAppDelegate {
    * APPに必要な物を初期化する。
    */
   public initialize(): boolean {
+    // try to attach canvas
+    const canvasById = document
+      .getElementsByTagName('canvas')
+      .namedItem(appConfig._CanvasId);
+    canvas = canvasById;
+
     // キャンバスの作成
-    canvas = document.createElement('canvas');
-    // make the newly created canvas fit the window
-    if (appConfig.CanvasSize === 'auto') {
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
+    if (!canvasById) {
+      canvas = document.createElement('canvas');
+      // make the newly created canvas fit the window
+      if (appConfig.CanvasSize === 'auto') {
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+      }
     }
 
     this._initializeCanvasSize();
@@ -70,15 +78,17 @@ export class LAppDelegate {
       alert('Cannot initialize WebGL. This browser does not support.');
       gl = null;
 
-      document.body.innerHTML =
+      (canvasById || document.body).innerHTML =
         'This browser does not support the <code>&lt;canvas&gt;</code> element.';
 
       // gl初期化失敗
       return false;
     }
 
-    // キャンバスを DOM に追加
-    document.body.appendChild(canvas);
+    if (!canvasById) {
+      // キャンバスを DOM に追加
+      document.body.appendChild(canvas);
+    }
 
     // set up the resizing handling
     if (appConfig.CanvasSize === 'auto') {

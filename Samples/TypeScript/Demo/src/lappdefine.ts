@@ -17,6 +17,9 @@ export let appConfig: IAppConfig = JSON.parse(
  * Sample Appで使用する定数
  */
 export interface IAppConfig {
+  // Use the canvas with this ID, or use a newly created canvas ('' or any invalid ID)
+  _CanvasId: string;
+
   // Canvas width and height pixel values, or dynamic screen size ('auto').
   CanvasSize: { width: number; height: number } | 'auto';
 

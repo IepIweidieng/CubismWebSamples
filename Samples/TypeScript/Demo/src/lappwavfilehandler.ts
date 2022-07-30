@@ -84,7 +84,7 @@ export class LAppWavFileHandler {
     return true;
   }
 
-  public start(filePath: string): void {
+  public async start(filePath: string): Promise<void> {
     // サンプル位参照位置を初期化
     this._sampleOffset = 0;
     this._userTimeSeconds = 0.0;
@@ -92,7 +92,7 @@ export class LAppWavFileHandler {
     // RMS値をリセット
     this._lastRms = 0.0;
 
-    if (!this.loadWavFile(filePath)) {
+    if (!(await this.loadWavFile(filePath))) {
       return;
     }
   }
@@ -101,7 +101,7 @@ export class LAppWavFileHandler {
     return this._lastRms;
   }
 
-  public loadWavFile(filePath: string): boolean {
+  public async loadWavFile(filePath: string): Promise<boolean> {
     let ret = false;
 
     if (this._pcmData != null) {
@@ -115,7 +115,7 @@ export class LAppWavFileHandler {
       });
     };
 
-    const asyncWavFileManager = (async () => {
+    const asyncWavFileManager = await (async () => {
       this._byteReader._fileByte = await asyncFileLoad();
       this._byteReader._fileDataView = new DataView(this._byteReader._fileByte);
       this._byteReader._fileSize = this._byteReader._fileByte.byteLength;

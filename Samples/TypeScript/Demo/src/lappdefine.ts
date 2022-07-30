@@ -38,13 +38,13 @@ export interface IAppConfig {
   // 相対パス
   ResourcesPath: string;
 
-  // モデルの後ろにある背景の画像ファイル
+  // モデルの後ろにある背景の画像ファイル, or disable the image ('' or any invalid path)
   BackImageName: string;
 
-  // 歯車
+  // 歯車, or disable the image ('' or any invalid path)
   GearImageName: string;
 
-  // 終了ボタン
+  // 終了ボタン, or disable the image ('' or any invalid path)
   PowerImageName: string;
 
   // モデル定義---------------------------------------------

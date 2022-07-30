@@ -5,6 +5,7 @@
  * that can be found at https://www.live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
 
+import { appConfig } from './lappdefine';
 import { LAppPal } from './lapppal';
 
 export let s_instance: LAppWavFileHandler = null;
@@ -29,6 +30,7 @@ export class LAppWavFileHandler {
    */
   public static releaseInstance(): void {
     if (s_instance != null) {
+      s_instance._audioGain = null;
       s_instance._audioContext.close();
       s_instance._audioContext = null;
 
@@ -99,6 +101,7 @@ export class LAppWavFileHandler {
       return;
     }
 
+    this._audioGain.gain.value = appConfig._SoundPlaybackVolumn;
     this._audioSource.start(0);
   }
 
@@ -235,6 +238,10 @@ export class LAppWavFileHandler {
                 webkitAudioContext: { new (): AudioContext };
               }
             ).webkitAudioContext)();
+
+          // audio routing
+          this._audioGain = this._audioContext.createGain();
+          this._audioGain.connect(this._audioContext.destination);
         }
 
         // create audio buffer for playback
@@ -265,7 +272,7 @@ export class LAppWavFileHandler {
         }
 
         // connect to playback device
-        this._audioSource.connect(this._audioContext.destination);
+        this._audioSource.connect(this._audioGain);
 
         ret = true;
       } catch (e) {
@@ -337,6 +344,7 @@ export class LAppWavFileHandler {
   };
   _audioContext: AudioContext;
   _audioSource: AudioBufferSourceNode;
+  _audioGain: GainNode;
 }
 
 export class WavFileInfo {

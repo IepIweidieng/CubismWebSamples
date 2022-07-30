@@ -89,6 +89,10 @@ export interface IAppConfig {
   // [red, green, blue, alpha] (0.0 to 1.0)
   _RenderClearColor: [number, number, number, number];
 
+  // Set the playback volumn of motion sound
+  // Normal: 100% (1.0), mute: 0% (0.0)
+  _SoundPlaybackVolumn: number;
+
   // Relative path to the custom configuration file
   _ConfigFileName: string;
 }

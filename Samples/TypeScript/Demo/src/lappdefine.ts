@@ -9,7 +9,7 @@ import { LogLevel } from '@framework/live2dcubismframework';
 import appConfigDefault from '../lappconfigdefault.json';
 
 export { appConfigDefault };
-export let appConfig: IAppConfig = JSON.parse(
+export const appConfig: IAppConfig = JSON.parse(
   JSON.stringify(appConfigDefault)
 ) as IAppConfig;
 
@@ -106,7 +106,11 @@ export class LAppDefine {
    * @return whether the operation successed
    */
   public static reset(): boolean {
-    appConfig = JSON.parse(JSON.stringify(appConfigDefault)) as IAppConfig;
+    Object.keys(appConfig).forEach(key => delete appConfig[key]);
+    Object.assign(
+      appConfig,
+      JSON.parse(JSON.stringify(appConfigDefault)) as IAppConfig
+    );
     return true;
   }
 

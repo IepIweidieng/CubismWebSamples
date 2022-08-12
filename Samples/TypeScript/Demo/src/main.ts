@@ -8,6 +8,8 @@
 import { LAppDelegate } from './lappdelegate';
 import { appConfig, LAppDefine } from './lappdefine';
 
+export { appConfig, LAppDefine };
+
 /**
  * ブラウザロード後の処理
  */
